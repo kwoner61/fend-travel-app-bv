@@ -45,8 +45,8 @@ app.get('/voyage/:cityName', async (req, res) => {
 
   let respObj = {
     message: '',
-    data: {},
-    errors: []
+    weather: {},
+    picUrl: ''
   }
 
   const cityName = req.params.cityName
@@ -66,12 +66,13 @@ app.get('/voyage/:cityName', async (req, res) => {
 
     const weatherData = await getWeatherForecast(coordinates.lng, coordinates.lat)
     assert(weatherData, 'Unable to retrieve weather forecast for given city.')
+    respObj.weather = weatherData
 
-    respObj.data = weatherData
+    respObj.picUrl = await getPicUrlFromPixabay(cityName, countryName)
+
   } catch (error) {
     respObj.message = 'error /voyage/ ' + error
   } finally {
-    
     res.status(200).send(respObj)
   }
 
@@ -129,6 +130,28 @@ const getWeatherForecast = ((lng, lat) => {
   })
 })
 
+// Search for an image matching city and country name from Pixabay
+// Return the URL to the image
+const getPicUrlFromPixabay = ((cityName, countryName = '') => {
+  return axios.get(pixabayUrl, {
+    params: {
+      q: encodeURIComponent(new String(cityName + ' ' + countryName).trim()),
+      image_type: 'photo',
+      orientation: 'horizontal',
+      category: 'places', // travel
+      per_page: 3, // Minimum is 3
+      key: pixabayApiKey
+    }
+  })
+  .then((resp) => {
+    //console.log('response from pixabay: ', resp.data.hits)
+    return resp.data.hits[0].webformatURL
+  })
+  .catch((err) => {
+    console.log('error !! from pixabay: ', err)
+    return null
+  })
+})
 
 // Return projectData
 app.get('/journal-entries', function (req, res) {

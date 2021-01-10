@@ -11,3 +11,6 @@ My FEND Capstone Project: Bon Voyage
 - precip: how much precipiation?
 - snow: how much snowfall?
 - snow_depth: Snow Depth
+
+## Pixabay properties
+- webformatURL
