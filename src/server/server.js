@@ -3,7 +3,8 @@ projectData = {}
 
 // API URLs
 const geonamesUrl = 'http://api.geonames.org/searchJSON'
-
+const weatherbitUrl = 'https://api.weatherbit.io/v2.0/forecast/daily'
+const pixabayUrl = 'https://pixabay.com/api'
 
 // Require Express to run server and routes
 const express = require('express')
@@ -63,7 +64,10 @@ app.get('/voyage/:cityName', async (req, res) => {
     assert(coordinates, 'Unable to retrieve coordinates for given city.')
     //console.log('coords: ', coordinates.lng, coordinates.lat)
 
-    respObj.data = coordinates
+    const weatherData = await getWeatherForecast(coordinates.lng, coordinates.lat)
+    assert(weatherData, 'Unable to retrieve weather forecast for given city.')
+
+    respObj.data = weatherData
   } catch (error) {
     respObj.message = 'error /voyage/ ' + error
   } finally {
@@ -102,7 +106,28 @@ const getGeoLocation = ((cityName) => {
   })
 })
 
+const getWeatherForecast = ((lng, lat) => {
+  return axios.get(weatherbitUrl, {
+    params: {
+      lon: lng,
+      lat: lat,
+      key: weatherbitApiKey,
+      units: 'I', // TODO: Parameterize this
+      days: 1
+    }
+  })
+  .then((resp) => {
+    // console.log('response from weatherbit: ', resp.data)
+    assert(resp.data.data, 'No weather forecast!')
+    const weatherForecastList = resp.data.data
 
+    return weatherForecastList
+  })
+  .catch((err) => {
+    console.log('error !! from weatherbit: ', err)
+    return null
+  })
+})
 
 
 // Return projectData
