@@ -13,6 +13,7 @@ const dotenv = require('dotenv')
 const cors = require('cors')
 const axios = require('axios')
 const assert = require('assert')
+const countries = require("i18n-iso-countries")
 
 // Start up an instance of app
 const app = express()
@@ -60,7 +61,7 @@ app.get('/voyage/:cityName', async (req, res) => {
   //console.log('countryName ', countryName)
 
   try {
-    const coordinates = await getGeoLocation(cityName)
+    const coordinates = await getGeoLocation(cityName, countryName)
     assert(coordinates, 'Unable to retrieve coordinates for given city.')
     //console.log('coords: ', coordinates.lng, coordinates.lat)
 
@@ -80,20 +81,20 @@ app.get('/voyage/:cityName', async (req, res) => {
 })
 
 
-const getGeoLocation = ((cityName) => {
+const getGeoLocation = ((cityName, countryName = '') => {
   return axios.get(geonamesUrl, {
     params: {
       q: cityName,
       maxRows: 1,
       username: geonamesApiKey,
-      //country: req.query.country  // TODO: use pycountry here to convert country name to ISO-3166 (country codes)
+      country: countries.getAlpha2Code(countryName, "en")
     }
   })
   .then((resp) => {
     //console.log('response from geonames: ', resp)
 
     if (resp.data.totalResultsCount == 0) {
-      respObj.message = 'I wasn\'t able to find the city.'
+      console.log('Unable to find location from geonames')
       return null
     }
     return {
@@ -120,7 +121,7 @@ const getWeatherForecast = ((lng, lat) => {
   .then((resp) => {
     // console.log('response from weatherbit: ', resp.data)
     assert(resp.data.data, 'No weather forecast!')
-    const weatherForecastList = resp.data.data
+    const weatherForecastList = resp.data
 
     return weatherForecastList
   })
