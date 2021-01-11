@@ -35,22 +35,13 @@ app.use(cors())
 // Initialize the main project folder
 app.use(express.static('dist'))
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // Entry point for handling client's requests
-// Example request path = /voyage/paris?startdate=1-23-2021&enddate=1-30-2021&countryname=France
 app.get('/voyage/:cityName', async (req, res) => {
-
-  let respObj = {
-    message: '',
-    weather: {},
-    picUrl: ''
-  }
-
+  let respObj = {}
   const cityName = req.params.cityName
   const startDate = Date.parse(req.query.startdate)
   const endDate = Date.parse(req.query.enddate)
   const countryName = req.query.countryname
-
   console.log(startDate + ':' + endDate + ':' + cityName + ':' + countryName)
 
   try {
@@ -58,9 +49,9 @@ app.get('/voyage/:cityName', async (req, res) => {
     assert(coordinates, 'Unable to retrieve coordinates for given city.')
     console.log('coords: ', coordinates.lng, coordinates.lat)
 
-    const weatherData = await getWeatherForecast(coordinates.lng, coordinates.lat)
+    const weatherData = await getWeatherData(coordinates.lng, coordinates.lat)
     assert(weatherData, 'Unable to retrieve weather forecast for given city.')
-    console.log('weatherbit: ', weatherData.city_name, weatherData.country_code)
+    console.log('weatherbit: ', weatherData.city, weatherData.country_code)
     respObj.weather = weatherData
 
     respObj.picUrl = await getPicUrlFromPixabay(cityName, countryName)
@@ -68,12 +59,12 @@ app.get('/voyage/:cityName', async (req, res) => {
   } catch (error) {
     respObj.message = 'error /voyage/ ' + error
   } finally {
+    respObj.message = 'OK!'
     res.status(200).send(respObj)
   }
-
-  
 })
 
+// Call Geonames API to get the coordinate for given city and country
 const getGeoLocation = ((cityName, countryName = '') => {
   return axios.get(geonamesUrl, {
     params: {
@@ -84,8 +75,6 @@ const getGeoLocation = ((cityName, countryName = '') => {
     }
   })
   .then((resp) => {
-    //console.log('response from geonames: ', resp)
-
     if (resp.data.totalResultsCount == 0) {
       console.log('Unable to find location from geonames')
       return null
@@ -101,21 +90,44 @@ const getGeoLocation = ((cityName, countryName = '') => {
   })
 })
 
-const getWeatherForecast = ((lng, lat) => {
+// Call Weatherbit API to get weather forecast for given location
+const getWeatherData = ((lng, lat) => {
+  let returnObj = {
+    city: '',
+    country_code: '',
+    forecastList: []
+  }
   return axios.get(weatherbitUrl, {
     params: {
       lon: lng,
       lat: lat,
       key: weatherbitApiKey,
       units: 'I', // TODO: Parameterize this
-      days: 1
+      days: 16
     }
   })
   .then((resp) => {
-    assert(resp.data.data, 'No weather forecast received!')
-    const weatherForecastList = resp.data
+    assert(resp.data.data.length > 0, 'No weather forecast received!')
+    const weatherData = resp.data.data
 
-    return weatherForecastList
+    returnObj.city = resp.data.city_name
+    returnObj.country_code = resp.data.country_code
+
+    weatherData.forEach(forecast => {
+      returnObj.forecastList.push({
+        date: forecast.valid_date,
+        weather_icon: forecast.weather.icon,
+        description: forecast.weather.description,
+        max_temp: forecast.max_temp,
+        min_temp: forecast.min_temp,
+        chance_of_precip: forecast.pop,
+        precip_amount: forecast.precip,
+        snow_amount: forecast.snow,
+        snow_depth: forecast.snow_depth
+      })
+    });
+
+    return returnObj
   })
   .catch((err) => {
     console.log('error !! from weatherbit: ', err)
