@@ -13,7 +13,7 @@ const dotenv = require('dotenv')
 const cors = require('cors')
 const axios = require('axios')
 const assert = require('assert')
-const countries = require("i18n-iso-countries")
+const countries = require('i18n-iso-countries')
 
 // Start up an instance of app
 const app = express()
@@ -41,7 +41,7 @@ app.use(express.static('dist'))
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // Entry point for handling client's requests
-// Example request path = /voyage/paris?startdate=1/23/2021&enddate=1/30/2021
+// Example request path = /voyage/paris?startdate=1-23-2021&enddate=1-30-2021&countryname=France
 app.get('/voyage/:cityName', async (req, res) => {
 
   let respObj = {
@@ -55,18 +55,16 @@ app.get('/voyage/:cityName', async (req, res) => {
   const endDate = Date.parse(req.query.enddate)
   const countryName = req.query.countryname
 
-  console.log('startDate ', startDate)
-  console.log('endDate ', endDate)
-  //console.log('cityName ', cityName)
-  //console.log('countryName ', countryName)
+  console.log(startDate + ':' + endDate + ':' + cityName + ':' + countryName)
 
   try {
     const coordinates = await getGeoLocation(cityName, countryName)
     assert(coordinates, 'Unable to retrieve coordinates for given city.')
-    //console.log('coords: ', coordinates.lng, coordinates.lat)
+    console.log('coords: ', coordinates.lng, coordinates.lat)
 
     const weatherData = await getWeatherForecast(coordinates.lng, coordinates.lat)
     assert(weatherData, 'Unable to retrieve weather forecast for given city.')
+    console.log('weatherbit: ', weatherData.city_name, weatherData.country_code)
     respObj.weather = weatherData
 
     respObj.picUrl = await getPicUrlFromPixabay(cityName, countryName)
@@ -87,7 +85,7 @@ const getGeoLocation = ((cityName, countryName = '') => {
       q: cityName,
       maxRows: 1,
       username: geonamesApiKey,
-      country: countries.getAlpha2Code(countryName, "en")
+      country: countries.getAlpha2Code(countryName, 'en')
     }
   })
   .then((resp) => {
@@ -119,8 +117,7 @@ const getWeatherForecast = ((lng, lat) => {
     }
   })
   .then((resp) => {
-    // console.log('response from weatherbit: ', resp.data)
-    assert(resp.data.data, 'No weather forecast!')
+    assert(resp.data.data, 'No weather forecast received!')
     const weatherForecastList = resp.data
 
     return weatherForecastList
@@ -134,9 +131,12 @@ const getWeatherForecast = ((lng, lat) => {
 // Search for an image matching city and country name from Pixabay
 // Return the URL to the image
 const getPicUrlFromPixabay = ((cityName, countryName = '') => {
+
+  const qValue = (cityName + ' ' + countryName).trim()
+  console.log('Pixabay q value = ', qValue)
   return axios.get(pixabayUrl, {
     params: {
-      q: encodeURIComponent(new String(cityName + ' ' + countryName).trim()),
+      q: qValue,
       image_type: 'photo',
       orientation: 'horizontal',
       category: 'places', // travel
@@ -145,7 +145,6 @@ const getPicUrlFromPixabay = ((cityName, countryName = '') => {
     }
   })
   .then((resp) => {
-    //console.log('response from pixabay: ', resp.data.hits)
     return resp.data.hits[0].webformatURL
   })
   .catch((err) => {
@@ -172,7 +171,7 @@ app.post('/journal-entries', function (req, res) {
 })
 
 function listening() {
-  console.log("server running")
+  console.log('server running')
   console.log(`running on localhost: {$port}`)
 }
 
