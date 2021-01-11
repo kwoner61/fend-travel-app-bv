@@ -125,7 +125,7 @@ const getWeatherData = ((lng, lat) => {
         snow_amount: forecast.snow,
         snow_depth: forecast.snow_depth
       })
-    });
+    })
 
     return returnObj
   })
