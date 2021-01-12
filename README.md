@@ -3,8 +3,6 @@ My FEND Capstone Project: Bon Voyage
 
 ## Setup
 - Checkout repository
-- Copy the `.env.sample` file and rename to `.env`
-- Update `.env` file with API keys
 - Install `npm i`
 - `npm run build && npm run start`
 
