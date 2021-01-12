@@ -1,4 +1,4 @@
-const PORT = 9090 // TODO: Parameterize this
+const PORT = 8080 // TODO: Parameterize this
 
 const serverUrl = `http://localhost:${PORT}/voyage`
 
