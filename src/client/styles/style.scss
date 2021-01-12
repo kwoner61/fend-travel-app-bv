@@ -3,9 +3,14 @@
 $oswald: "Oswald", sans-serif;
 $ranga: "Ranga";
 
+#image-holder {
+  width: 100%;
+  display: none;
+}
+
 body {
   background: #fffff8;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: $oswald;
 }
 
 #app {
@@ -50,6 +55,10 @@ button {
   font-family: $oswald;
   border: none;
   box-shadow: 2px 4px 5px #444;
+
+  &:hover {
+    cursor: pointer
+  }
 }
 
 h1 {

@@ -1,8 +1,8 @@
-import { onGenerate } from './js/submitHandler'
+import { onGenerate, scrollToBottom } from './js/submitHandler'
 
 import './styles/container.scss'
 import './styles/style.scss'
 
 export {
-    onGenerate
+    onGenerate, scrollToBottom
 }

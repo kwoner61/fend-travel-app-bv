@@ -3,36 +3,56 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Bon Voyage Travel App</title>
+  <title>Travel App</title>
 </head>
 
 <body>
-  <div id="app" class="flex-container">
-    <div class="holder headline flex-items">
-      <h1>Bon Voyage Travel App</h1>
+  <main class="grid">
+    
+    <div class="grid-heading">
+      <h1>Travel App</h1>
     </div>
-    <div class="holder flex-items">
-      <label for="zip">Enter Zipcode here</label>
-      <input type="text" id="zip" placeholder="enter zip code here">
-    </div>
-    <div class="holder feel flex-items">
-      <label for="feelings">How are you feeling today?</label>
-      <textarea class="myInput" id="feelings" \ placeholder="Enter your feelings here" \ rows="9" cols="50"
-        maxlength="350"></textarea>
-    </div>
-    <div class="flex-items">
-      <button id="generate" type="submit" onclick="Client.onGenerate()"> Generate </button>
-    </div>
-    <div class="holder entry flex-items">
-      <div class="title">Most Recent Entry</div>
-      <div id="entryHolder">
-        <div id="date"></div>
-        <div id="temp"></div>
-        <div id="content"></div>
+
+    <div class="grid-form flex">
+      <div class="flex-item">
+        <label for="city">Where are you going?</label>
+        <input type="text" id="city" placeholder="Enter city here: New York City">
+      </div>
+      
+      <div class="flex-item">
+        <label for="country">In which country? (Optional)</label>
+        <input type="text" id="country" placeholder="Enter country here: United States of America">
+      </div>
+      
+      <div class="flex-item">
+        <label for="">When do you leave?</label>
+        <input type="date" id="start">
+      </div>
+      
+      <div class="flex-item">
+        <label for="">When do you return?</label>
+        <input type="date" id="end">
       </div>
     </div>
-  </div>
 
+    <div class="grid-submit">
+      <button id="generate" type="submit" onclick="Client.onGenerate()"> Create Trip Details </button>
+    </div>
+
+  </main>
+
+  <aside class="grid-below" id="grid-below">
+    <div class="flex">
+      <picture class="flex-item">
+        <img id="image-holder" alt="Pixabay returned an invalid image URL." onload="Client.scrollToBottom()">
+      </picture>
+      <div id="destination" class="flex-item"></div>
+      <div id="date" class="flex-item"></div>
+      <div id="trip-duration" class="flex-item"></div>
+      <div id="trip-until" class="flex-item"></div>
+      <div id="weather" class="flex-item"></div>
+    </div>
+  </aside>
 </body>
 
 </html>
