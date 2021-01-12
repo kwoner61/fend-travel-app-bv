@@ -44,6 +44,7 @@
     "superagent": "^6.1.0",
     "supertest": "^6.0.1",
     "terser-webpack-plugin": "^4.2.3",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "workbox-webpack-plugin": "^6.0.2"
   }
 }
