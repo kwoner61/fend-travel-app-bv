@@ -2,6 +2,7 @@
 const geonamesUrl = 'http://api.geonames.org/searchJSON'
 const weatherbitUrl = 'https://api.weatherbit.io/v2.0/forecast/daily'
 const pixabayUrl = 'https://pixabay.com/api'
+const defaultPicUrl = 'https://pixabay.com/get/57e1d14a485aa514f1dc8460c6213f7c1d36dbec4e507748752b79d09045c5_640.jpg'
 
 // Require Express to run server and routes
 const express = require('express')
@@ -152,7 +153,12 @@ const getPicUrlFromPixabay = ((cityName, countryName = '') => {
     }
   })
   .then((resp) => {
-    return resp.data.hits[0].webformatURL
+    const imgSearchResults = resp.data.hits
+    if (imgSearchResults.length > 0) {
+      return resp.data.hits[0].webformatURL
+    } else {
+      return defaultPicUrl
+    }
   })
   .catch((err) => {
     console.log('error !! from pixabay: ', err)
